@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyEvent::ReverseHTTP
 
+0.03  Mon Aug  3 16:10:04 PDT 2009
+        - Include eg/proxy.pl example (Daisuke Murase)
+        - Changed default label to use SHA1 to be non-guessable
+
 0.02  Mon Aug  3 04:34:09 PDT 2009
         - Changed default label naming scheme to avoid possible RFC errors
         - Supported returning AnyEvent condvar to do non-blocking HTTP handling
