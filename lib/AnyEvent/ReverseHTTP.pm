@@ -85,7 +85,7 @@ sub connect {
                 my $res  = $self->on_request->($req);
 
                 # Duck typing for as_string, but accepts plaintext too for 200
-                unless ($res->can('as_string')) {
+                unless (Scalar::Util::blessed($res) && $res->can('as_string')) {
                     my $content = $res;
                     $res = HTTP::Response->new(200);
                     $res->content_type('text/plain');
