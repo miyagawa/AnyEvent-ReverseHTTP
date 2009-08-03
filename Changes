@@ -1,4 +1,8 @@
 Revision history for Perl extension AnyEvent::ReverseHTTP
 
+0.02  Mon Aug  3 04:34:09 PDT 2009
+        - Changed default label naming scheme to avoid possible RFC errors
+        - Supported returning AnyEvent condvar to do non-blocking HTTP handling
+
 0.01  Sun Aug  2 20:56:59 2009
         - original version
