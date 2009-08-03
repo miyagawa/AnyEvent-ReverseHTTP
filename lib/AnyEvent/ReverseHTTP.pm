@@ -5,6 +5,7 @@ use 5.008_001;
 our $VERSION = '0.01';
 
 use Carp;
+use AnyEvent::Util;
 use AnyEvent::HTTP;
 use HTTP::Request;
 use HTTP::Response;
@@ -115,17 +116,13 @@ sub connect {
         http_get $url, $poller;
     };
 
-    return $guard;
+    return AnyEvent::Util::guard { undef $guard; undef $self };
 }
 
 sub _extract_link {
     my($hdr, $rel) = @_;
     my @links = $hdr->{link} =~ /<([^>]*)>;\s*rel="\Q$rel\E"/g;
     return $links[0];
-}
-
-sub DESTROY {
-    warn "destroy me";
 }
 
 no Any::Moose;
