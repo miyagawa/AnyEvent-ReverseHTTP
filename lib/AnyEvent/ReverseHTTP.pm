@@ -24,7 +24,7 @@ has endpoint => (
 
 has label => (
     is => 'rw', isa => 'Str',
-    required => 1, lazy => 1,
+    required => 1,
     lazy => 1, default => sub { "anyevent" . int rand 100000 },
 );
 
