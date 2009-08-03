@@ -84,28 +84,39 @@ sub connect {
                 my $req  = HTTP::Request->parse($body);
                 my $res  = $self->on_request->($req);
 
-                # Duck typing for as_string, but accepts plaintext too for 200
-                unless (Scalar::Util::blessed($res) && $res->can('as_string')) {
-                    my $content = $res;
-                    $res = HTTP::Response->new(200);
-                    $res->content_type('text/plain');
-                    $res->content($content);
+                my $postback = sub {
+                    my $res = shift;
+
+                    # Duck typing for as_string, but accepts plaintext too for 200
+                    unless (Scalar::Util::blessed($res) && $res->can('as_string')) {
+                        my $content = $res;
+                        $res = HTTP::Response->new(200);
+                        $res->content_type('text/plain');
+                        $res->content($content);
+                    }
+
+                    $res->protocol("HTTP/1.1"); # Upgrade since reversehttp.net requires so
+
+                    # HTTP::Response->as_string by default adds a new line which could be harmful
+                    my $res_body = $res->as_string;
+                    chomp $res_body if $res->content_type eq 'text/plain';
+
+                    http_post $hdr->{URL}, $res_body,
+                        headers => { 'content-type' => 'message/http' },
+                        sub {
+                            my($body, $hdr) = @_;
+                            if ($hdr->{Status} ne '202') {
+                                $self->on_error->("$hdr->{Status}: $hdr->{Reason}");
+                            }
+                        };
+                };
+
+                # Return condvar to pass back to event loop
+                if (Scalar::Util::blessed($res) && $res->isa('AnyEvent::CondVar')) {
+                    $res->cb(sub { $postback->($res->recv) });
+                } else {
+                    $postback->($res);
                 }
-
-                $res->protocol("HTTP/1.1"); # Upgrade since reversehttp.net requires so
-
-                # HTTP::Response->as_string by default adds a new line which could be harmful
-                my $res_body = $res->as_string;
-                chomp $res_body if $res->content_type eq 'text/plain';
-
-                http_post $hdr->{URL}, $res_body,
-                    headers => { 'content-type' => 'message/http' },
-                    sub {
-                        my($body, $hdr) = @_;
-                        if ($hdr->{Status} ne '202') {
-                            $self->on_error->("$hdr->{Status}: $hdr->{Reason}");
-                        }
-                    };
             }
 
             my $next = _extract_link($hdr, 'next');
@@ -162,7 +173,7 @@ AnyEvent::ReverseHTTP - reversehttp for AnyEvent
 
   $server->on_request(sub {
       my $req = shift;
-      # $req is HTTP::Request, return HTTP::Response
+      # $req is HTTP::Request, return HTTP::Response or AnyEvent::CondVar that receives it
   });
 
   my $guard = $server->connect;
