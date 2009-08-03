@@ -25,7 +25,11 @@ has endpoint => (
 has label => (
     is => 'rw', isa => 'Str',
     required => 1,
-    lazy => 1, default => sub { "anyevent" . int rand 100000 },
+    lazy => 1, default => sub {
+        require Digest::SHA;
+        require Time::HiRes;
+        return Digest::SHA::sha1_hex($$ . Time::HiRes::gettimeofday() . {});
+    },
 );
 
 has token => (
