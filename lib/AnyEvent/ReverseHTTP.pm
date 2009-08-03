@@ -67,7 +67,7 @@ sub connect {
 
     my $body = join "&", map "$_=" . URI::Escape::uri_escape($query{$_}), keys %query;
 
-    my $guard = http_post $self->endpoint, $body, sub {
+    http_post $self->endpoint, $body, sub {
         my($body, $hdr) = @_;
 
         if ($hdr->{Status} eq '201' || $hdr->{Status} eq '204') {
@@ -127,7 +127,7 @@ sub connect {
         http_get $url, $poller;
     };
 
-    return AnyEvent::Util::guard { undef $guard; undef $self };
+    return AnyEvent::Util::guard { undef $self };
 }
 
 sub _extract_link {
