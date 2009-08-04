@@ -86,6 +86,7 @@ sub connect {
 
             if ($hdr->{Status} eq '200') {
                 my $req  = HTTP::Request->parse($body);
+                $req->header('Requesting-Client', $hdr->{'requesting-client'});
                 my $res  = $self->on_request->($req);
 
                 my $postback = sub {
