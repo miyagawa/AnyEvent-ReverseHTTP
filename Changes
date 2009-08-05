@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::ReverseHTTP
 
+0.05  Wed Aug  5 16:48:13 PDT 2009
+        - Set "-" to default label since most people get confused
+
 0.04  Mon Aug  3 20:30:49 PDT 2009
         - Set Requeting-Client to the request object
 
