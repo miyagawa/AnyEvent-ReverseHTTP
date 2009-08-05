@@ -160,7 +160,7 @@ AnyEvent::ReverseHTTP - reversehttp for AnyEvent
   use AnyEvent::ReverseHTTP;
 
   # simple Hello World server
-  my $guard = reverse_http sub {
+  my $guard = reverse_http "myserver123", "token", sub {
       my $req = shift;
       return "Hello World"; # You can return HTTP::Response object for more control
   };
