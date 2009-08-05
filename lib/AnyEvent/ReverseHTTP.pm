@@ -34,6 +34,7 @@ has label => (
 
 has token => (
     is => 'rw', isa => 'Str',
+    default => '-',
 );
 
 has on_register => (
